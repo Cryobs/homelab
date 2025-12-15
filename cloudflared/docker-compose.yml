@@ -1,0 +1,15 @@
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    volumes:
+      - /mnt/cryobs/cloudflared:/etc/cloudflared:ro
+    networks:
+      - cloudflare_net
+
+networks:
+  cloudflare_net:
+    external: true
