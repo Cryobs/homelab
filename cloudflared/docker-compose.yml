@@ -11,5 +11,5 @@ services:
       - cloudflare_net
 
 networks:
-  cloudflare_net:
+  cloudflare-net:
     external: true
