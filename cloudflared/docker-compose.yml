@@ -3,7 +3,7 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
-    restart: unless-stopped
+    restart: always
     command: tunnel run
     volumes:
       - /mnt/cryobs/cloudflared:/etc/cloudflared:ro

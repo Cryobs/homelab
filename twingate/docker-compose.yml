@@ -2,6 +2,7 @@ services:
   twingate-connector:
     image: twingate/connector:latest
     network_mode: host
+    restart: always
     environment:
       - TWINGATE_NETWORK=${TWINGATE_NETWORK}
       - TWINGATE_ACCESS_TOKEN=${TWINGATE_ACCESS_TOKEN}
