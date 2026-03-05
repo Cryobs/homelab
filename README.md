@@ -17,12 +17,12 @@ Personal self-hosted infrastructure running on Raspberry Pi 5. Built for learnin
 
 | Logo | Service | Purpose |
 |------|---------|---------|
-| ![Portainer](https://github.com/homarr-labs/dashboard-icons/blob/main/svg/portainer-alt.svg) | [Portainer](https://portainer.io) | Docker / GitOps manager |
-| ![Navidrome](https://avatars.githubusercontent.com/u/26692192?v=4) | [Navidrome](https://navidrome.org) | Music server |
-| ![PhotoPrism](https://dl.photoprism.app/img/logo/logo-crisp-square.svg) | [PhotoPrism](https://photoprism.app) | Photo server |
-| ![Vaultwarden](https://global.discourse-cdn.com/free1/uploads/vaultwarden/original/1X/26a1c808c7d5849039d47820eef7889b3415e5ec.png) | [Vaultwarden](https://github.com/dani-garcia/vaultwarden) | Password manager |
-| ![Cloudflared](https://www.vectorlogo.zone/logos/cloudflare/cloudflare-icon.svg) | [Cloudflared](https://github.com/cloudflare/cloudflared) | Secure tunneling |
-| ![Twingate](https://play-lh.googleusercontent.com/GBhNhKgjfy6i6Ucc0hyB-79WmcV7LvKSfGSy8iStFdZSaLioKQp5rPWjqsh2YFRRZsE1) | [Twingate](https://twingate.com) | Zero-trust VPN |
+| ![Portainer](https://github.com/homarr-labs/dashboard-icons/blob/main/svg/portainer-alt.svg | width=50) | [Portainer](https://portainer.io) | Docker / GitOps manager |
+| ![Navidrome](https://avatars.githubusercontent.com/u/26692192?v=4 | width=50) | [Navidrome](https://navidrome.org) | Music server |
+| ![PhotoPrism](https://dl.photoprism.app/img/logo/logo-crisp-square.svg | width=50) | [PhotoPrism](https://photoprism.app) | Photo server |
+| ![Vaultwarden](https://global.discourse-cdn.com/free1/uploads/vaultwarden/original/1X/26a1c808c7d5849039d47820eef7889b3415e5ec.png | width=50) | [Vaultwarden](https://github.com/dani-garcia/vaultwarden) | Password manager |
+| ![Cloudflared](https://www.vectorlogo.zone/logos/cloudflare/cloudflare-icon.svg | width=50) | [Cloudflared](https://github.com/cloudflare/cloudflared) | Secure tunneling |
+| ![Twingate](https://play-lh.googleusercontent.com/GBhNhKgjfy6i6Ucc0hyB-79WmcV7LvKSfGSy8iStFdZSaLioKQp5rPWjqsh2YFRRZsE1 | width=50) | [Twingate](https://twingate.com) | Zero-trust VPN |
 | ? | Personal website | [cryobs.xyz](https://cryobs.xyz) |
  
 ---
