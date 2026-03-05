@@ -17,14 +17,13 @@ Personal self-hosted infrastructure running on Raspberry Pi 5. Built for learnin
 
 | Logo | Service | Purpose |
 |------|---------|---------|
-| ![Portainer](https://github.com/homarr-labs/dashboard-icons/blob/main/svg/portainer-alt.svg =50x50) | [Portainer](https://portainer.io) | Docker / GitOps manager |
-| ![Navidrome](https://avatars.githubusercontent.com/u/26692192?v=4  =50x50) | [Navidrome](https://navidrome.org) | Music server |
-| ![PhotoPrism](https://dl.photoprism.app/img/logo/logo-crisp-square.svg  =50x50) | [PhotoPrism](https://photoprism.app) | Photo server |
-| ![Vaultwarden](https://global.discourse-cdn.com/free1/uploads/vaultwarden/original/1X/26a1c808c7d5849039d47820eef7889b3415e5ec.png =50x50) | [Vaultwarden](https://github.com/dani-garcia/vaultwarden) | Password manager |
-| ![Cloudflared](https://www.vectorlogo.zone/logos/cloudflare/cloudflare-icon.svg =50x50) | [Cloudflared](https://github.com/cloudflare/cloudflared) | Secure tunneling |
-| ![Twingate](https://play-lh.googleusercontent.com/GBhNhKgjfy6i6Ucc0hyB-79WmcV7LvKSfGSy8iStFdZSaLioKQp5rPWjqsh2YFRRZsE1 =50x50) | [Twingate](https://twingate.com) | Zero-trust VPN |
-| ? | Personal website | [cryobs.xyz](https://cryobs.xyz) |
- 
+| <img src="https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/portainer-alt.svg" width="40"> | [Portainer](https://portainer.io) | Docker / GitOps manager |
+| <img src="https://avatars.githubusercontent.com/u/26692192?v=4" width="40"> | [Navidrome](https://navidrome.org) | Music server |
+| <img src="https://dl.photoprism.app/img/logo/logo-crisp-square.svg" width="40"> | [PhotoPrism](https://photoprism.app) | Photo server |
+| <img src="https://global.discourse-cdn.com/free1/uploads/vaultwarden/original/1X/26a1c808c7d5849039d47820eef7889b3415e5ec.png" width="40"> | [Vaultwarden](https://github.com/dani-garcia/vaultwarden) | Password manager |
+| <img src="https://www.vectorlogo.zone/logos/cloudflare/cloudflare-icon.svg" width="40"> | [Cloudflared](https://github.com/cloudflare/cloudflared) | Secure tunneling |
+| <img src="https://play-lh.googleusercontent.com/GBhNhKgjfy6i6Ucc0hyB-79WmcV7LvKSfGSy8iStFdZSaLioKQp5rPWjqsh2YFRRZsE1" width="40"> | [Twingate](https://twingate.com) | Zero-trust VPN |
+| <img src="https://cryobs.xyz/favicon.ico" width="40"> | Personal website | [cryobs.xyz](https://cryobs.xyz) |
 ---
 
 ## Roadmap
