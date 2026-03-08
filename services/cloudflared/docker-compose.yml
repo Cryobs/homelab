@@ -5,7 +5,6 @@ services:
     container_name: cloudflared
     restart: always
     command: tunnel run
-    network_mode: host
     volumes:
       - /mnt/cryobs/cloudflared:/etc/cloudflared:ro
     networks:
