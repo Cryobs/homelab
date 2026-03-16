@@ -1,0 +1,7 @@
+---
+- name: Setup OpenSSH Server
+  hosts: all
+  become: yes
+
+  roles:
+    - { role: openssh, when: ansible_system == "Linux" }

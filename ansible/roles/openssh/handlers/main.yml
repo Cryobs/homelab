@@ -1,0 +1,7 @@
+---
+# handlers file for openssh
+
+- name: Debian Restart OpenSSH
+  service:
+    name: ssh
+    state: restarted

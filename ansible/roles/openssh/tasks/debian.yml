@@ -1,0 +1,14 @@
+---
+# tasks file for openssh
+
+- name: Debian | Install packages
+  apt:
+    pkg: "{{ packages }}"
+
+- name: Generate Config
+  template:
+    src: "sshd_config.j2"
+    dest: "/etc/ssh/sshd_config"
+    mode: "0600"
+  notify:
+    - Debian Restart OpenSSH

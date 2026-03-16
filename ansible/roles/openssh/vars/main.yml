@@ -1,0 +1,20 @@
+---
+# vars file for openssh
+packages:
+  openssh-server
+
+sshd_port: 22
+sshd_listen_address: "0.0.0.0"
+
+sshd_permit_root_login: "no"
+sshd_max_tries: 6
+sshd_max_sessions: 10
+
+sshd_pubkey_auth: "yes"
+sshd_password_auth: "no"
+sshd_permit_empty_pass: "no"
+
+sshd_allow_tcp_forward: "no"
+sshd_x11_forward: "no"
+
+sshd_permit_tunnel: "no"
