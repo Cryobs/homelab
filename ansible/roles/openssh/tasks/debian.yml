@@ -1,9 +1,16 @@
 ---
 # tasks file for openssh
 
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  ignore_errors: yes
+
 - name: Debian | Install packages
   apt:
     pkg: "{{ packages }}"
+    state: present
 
 - name: Generate Config
   template:

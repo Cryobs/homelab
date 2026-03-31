@@ -1,12 +1,15 @@
 ---
 # vars file for openssh
+
+public_key_file: "/home/cryobs/.ssh/laptop_key.pub"
+
 packages:
   openssh-server
 
 sshd_port: 22
 sshd_listen_address: "0.0.0.0"
 
-sshd_permit_root_login: "no"
+sshd_permit_root_login: "yes"
 sshd_max_tries: 6
 sshd_max_sessions: 10
 

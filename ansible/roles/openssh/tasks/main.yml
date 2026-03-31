@@ -1,6 +1,13 @@
 ---
 # tasks file for openssh
 
+
+- name: Add pub key
+  ansible.posix.authorized_key:
+    user: "{{ ansible_user }}"
+    state: present
+    key: "{{ lookup('file', public_key_file) }}"
+
 - name: Include playbook Debian
   include_tasks: debian.yml
   when: ansible_os_family == "Debian"

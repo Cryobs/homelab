@@ -1,2 +1,0 @@
-[homelab]
-raspi   ansible_host=192.168.100.14   ansible_user=raspi
