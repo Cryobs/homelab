@@ -1,0 +1,6 @@
+---
+# tasks file for docker
+
+- name: Include playbook Debian
+  include_tasks: debian.yml
+  when: ansible_os_family == "Debian"
