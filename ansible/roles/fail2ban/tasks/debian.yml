@@ -1,0 +1,20 @@
+---
+
+- name: Debian | Install fail2ban
+  apt:
+    pkg:  fail2ban
+    state: present
+    update_cache: yes
+
+- name: Debian | Generate jail.local config
+  template:
+    src:  "jail.local.j2"
+    dest: "/etc/fail2ban/jail.local"
+    mode: "0644"
+  notify: Debian Restart fail2ban
+
+- name: Debian | Enable and start fail2ban
+  systemd: 
+    name: fail2ban
+    enabled: yes
+    state: started

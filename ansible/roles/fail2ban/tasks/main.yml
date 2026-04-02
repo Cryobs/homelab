@@ -1,0 +1,7 @@
+---
+# tasks file for fail2ban
+
+- name: Include playbook Debian
+  include_tasks: debian.yml
+  when: ansible_os_family == "Debian"
+

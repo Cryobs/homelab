@@ -1,0 +1,8 @@
+---
+
+- name: Setup fail2ban
+  hosts: all
+  become: yes
+
+  roles:
+    - { role: fail2ban, when: ansible_system == "Linux" }
