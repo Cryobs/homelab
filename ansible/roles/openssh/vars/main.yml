@@ -1,7 +1,6 @@
 ---
 # vars file for openssh
 
-public_key_file: "/home/cryobs/.ssh/laptop_key.pub"
 
 packages:
   openssh-server

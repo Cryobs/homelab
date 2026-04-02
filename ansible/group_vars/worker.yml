@@ -1,0 +1,29 @@
+---
+ansible_ssh_private_key_file: ~/.ssh/laptop_key
+ansible_python_interpreter  : /usr/bin/python3
+
+public_key_file: "~/.ssh/laptop_key.pub"
+
+ufw_rules:
+  # SSH
+  - port: '22'
+    proto: tcp
+    rule: allow
+    log: true
+  # HTTP
+  - port: '80'
+    proto: tcp
+    rule: allow
+    log: false
+  # HTTPS
+  - port: '443'
+    proto: tcp
+    rule: allow
+    log: false
+  # WireGuard VPN
+  - port: '51820'
+    proto: udp
+    rule: allow
+    log: false
+
+
