@@ -1,6 +1,6 @@
 ---
 
-- name: Setup Docker for Debian/Ubuntu
+- name: Setup Docker
   hosts: all
   become: yes
 

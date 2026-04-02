@@ -1,0 +1,36 @@
+---
+
+- name: Debian | Installing UFW
+  apt:
+    pkg: ufw
+    state: present
+    update_cache: yes
+
+- name: Allow SSH
+  community.general.ufw:
+    rule: allow 
+    port: '22'
+    log: true
+
+- name: Allow HTTP
+  community.general.ufw:
+    rule: allow 
+    port: '80'
+    log: true
+
+- name: Allow HTTPS
+  community.general.ufw:
+    rule: allow 
+    port: '443'
+    log: true
+
+- name: Allow WireGuard
+  community.general.ufw:
+    rule: allow
+    port: '51820'
+    proto: udp
+
+- name: Set default policy and enable
+  community.general.ufw:
+    policy: deny
+    state: enabled

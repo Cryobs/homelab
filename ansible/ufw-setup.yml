@@ -1,0 +1,8 @@
+---
+- name: Setup UFW Firewall
+  hosts: all
+  become: yes
+
+  roles:
+    - { role: ufw, when: ansible_system == "Linux" }
+
