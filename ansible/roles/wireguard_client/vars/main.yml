@@ -1,0 +1,7 @@
+---
+# vars file for wireguard_client
+#wg_addr: "10.8.8.2"
+#wg_addr_mask: "24"
+
+#wg_allowed_ips: "10.8.8.0/24"
+

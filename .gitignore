@@ -1,2 +1,3 @@
 ansible/secrets
 ansible/hosts.txt
+*.key

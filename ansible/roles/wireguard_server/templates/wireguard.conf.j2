@@ -1,0 +1,11 @@
+[Interface]
+Address = {{ wg_addr }}/{{ wg_addr_mask }}
+ListenPort = {{ wg_port }}
+PrivateKey = {{ wg_private_key }}
+
+{% for host in groups['worker'] %}
+[Peer]
+PublicKey = {{ hostvars[host]['wg_public_key'] }}
+AllowedIPs = {{ hostvars[host]['wg_allowed_ips'] }}
+
+{% endfor %}

@@ -1,0 +1,48 @@
+---
+# tasks file for wireguard_client
+
+- name: Debian | Install wireguard
+  apt:
+    pkg:
+      - wireguard
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: RedHat | Install wireguard
+  dnf:
+    pkg:
+      - wireguard-tools
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Print public key
+  debug:
+    msg: "public: {{ wg_public_key }}"
+
+
+- name: Save private key to file 
+  copy:
+    content: "{{ wg_private_key }}"
+    dest: "/etc/wireguard/private.key"
+    mode: '0600'
+
+- name: Save public key to file 
+  copy:
+    content: "{{ wg_public_key }}"
+    dest: "/etc/wireguard/public.key"
+    mode: '0600'
+
+- name: Deploy wireguard config
+  template:
+    src: templates/wireguard.conf.j2
+    dest: "/etc/wireguard/{{ wg_if_name }}.conf"
+    mode: '0600'
+
+- name: "Enable and start {{ wg_if_name }}"
+  systemd:
+    name: "wg-quick@{{ wg_if_name }}"
+    enabled: yes
+    state: started
+
+
+

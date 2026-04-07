@@ -1,0 +1,55 @@
+---
+
+- name: Generate all keys
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Read private key if exists
+      slurp:
+        src: "/etc/wireguard/private.key"
+      register: wireguard_existing_private_key
+      ignore_errors: yes
+      delegate_to: "{{ inventory_hostname }}"
+      delegate_facts: true
+
+    - name: Generate private key
+      command: wg genkey
+      delegate_to: localhost
+      register: wireguard_genkey
+      when: wireguard_existing_private_key.failed
+
+    - name: Generate public key
+      shell: "echo {{ wireguard_genkey.stdout }} | wg pubkey"
+      delegate_to: localhost
+      register: wireguard_pubkey
+      when: wireguard_existing_private_key.failed
+
+    - name: Save keys to hostvars (new)
+      set_fact:
+        wg_private_key: "{{ wireguard_genkey.stdout }}"
+        wg_public_key: "{{ wireguard_pubkey.stdout }}"
+      delegate_to: "{{ inventory_hostname }}"
+      delegate_facts: true
+      when: wireguard_existing_private_key.failed
+
+    - name: Save keys to hostvars (existing)
+      set_fact:
+        wg_private_key: "{{ wireguard_existing_private_key.content | b64decode | trim }}"
+        wg_public_key: "{{ wireguard_existing_private_key.content | b64decode | trim | regex_replace('.*', '') }}"
+      delegate_to: "{{ inventory_hostname }}"
+      delegate_facts: true
+      when: not wireguard_existing_private_key.failed
+
+
+- name: Wireguard server
+  hosts: master
+  become: yes
+  roles:
+    - { role: wireguard_server, when: ansible_system == "Linux" }
+
+- name: Wireguard client
+  hosts: worker
+  become: yes
+  roles:
+    - { role: wireguard_client, when: ansible_system == "Linux" }
+

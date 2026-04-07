@@ -1,0 +1,7 @@
+---
+# vars file for wireguard_server
+
+#wg_addr: "10.8.8.1"
+#wg_addr_mask: "24"
+#wg_port: 51820
+#wg_if_name: "homelab"

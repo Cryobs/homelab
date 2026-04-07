@@ -1,0 +1,8 @@
+[Interface]
+Address = {{ wg_addr }}/{{ wg_addr_mask }}
+PrivateKey = {{ wg_private_key }}
+
+[Peer]
+PublicKey = {{ hostvars[groups['master'][0]]['wg_public_key'] }}
+Endpoint = {{ hostvars[groups['master'][0]]['ansible_host'] }}:{{ hostvars[groups['master'][0]]['wg_port'] }}
+AllowedIPs = {{ wg_allowed_ips }}
