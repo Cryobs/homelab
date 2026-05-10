@@ -44,6 +44,6 @@ services:
     # User without root privileges, but with access to `./data`.
     user: 1001:1001
     volumes:
-      - ./mnt/cryobs/forgejo:/data
+      - /mnt/cryobs/forgejo:/data
     restart: 'unless-stopped'
     command: 'forgejo-runner daemon --config runner-config.yml'
