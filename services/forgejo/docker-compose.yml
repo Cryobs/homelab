@@ -9,6 +9,8 @@ services:
     environment:
       - USER_UID=1000
       - USER_GID=1000
+      - FORGEJO__server__SSH_PORT=222
+      - FORGEJO__server__SSH_LISTEN_PORT=22
     restart: always
     networks:
       - forgejo
