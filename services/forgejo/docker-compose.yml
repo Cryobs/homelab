@@ -10,7 +10,6 @@ services:
       - USER_UID=1000
       - USER_GID=1000
       - FORGEJO__server__SSH_PORT=222
-      - FORGEJO__server__SSH_LISTEN_PORT=22
     restart: always
     networks:
       - forgejo
@@ -19,4 +18,32 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - '3000:3000'
-      - '222:22'
+      - '222:222'
+
+  docker-in-docker:
+    image: docker:dind
+    container_name: 'docker_dind'
+    privileged: 'true'
+    command: ['dockerd', '-H', 'tcp://0.0.0.0:2375', '--tls=false']
+    restart: 'unless-stopped'
+    networks:
+      - forgejo
+
+  runner:
+    image: 'data.forgejo.org/forgejo/runner:12'
+    links:
+      - docker-in-docker
+    networks:
+      - forgejo
+    depends_on:
+      docker-in-docker:
+        condition: service_started
+    container_name: 'runner'
+    environment:
+      DOCKER_HOST: tcp://docker-in-docker:2375
+    # User without root privileges, but with access to `./data`.
+    user: 1001:1001
+    volumes:
+      - ./mnt/cryobs/forgejo:/data
+    restart: 'unless-stopped'
+    command: 'forgejo-runner daemon --config runner-config.yml'
