@@ -1,0 +1,24 @@
+---
+- name: List available disk IDs for reference
+  command: ls -l /dev/disk/by-id/
+  register: disk_ids_list
+  changed_when: false
+
+- name: Display available disk IDs
+  debug:
+    msg: "{{ disk_ids_list.stdout_lines }}"
+  when: external_disks | length == 0
+
+
+- name: Warning if no disks configured
+  debug:
+    msg: "WARNING: No external disks configured in external_disks variable!"
+  when: external_disks | length == 0
+
+
+- name: Process each external disk
+  include_tasks: mount_single_disk.yml
+  loop: "{{ external_disks }}"
+  loop_control:
+    loop_var: disk
+  when: external_disks | length > 0

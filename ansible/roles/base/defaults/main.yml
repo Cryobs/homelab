@@ -1,0 +1,145 @@
+
+---
+# Timezone & locale
+timezone: Europe/Warsaw
+locale: en_US.UTF-8
+locale_gen:
+  - en_US.UTF-8 UTF-8
+  - ru_RU.UTF-8 UTF-8
+
+
+# Packages
+base_packages:
+  - curl
+  - wget
+  - git
+  - htop
+  - vim
+  - tmux
+  - net-tools
+  - rsync
+  - unzip
+  - zip
+  - tree
+  - ncdu
+  - lsof
+  - strace
+  - python3
+  - python3-pip
+  - python3-venv
+  - sudo
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - apt-transport-https
+  - software-properties-common
+
+
+# NTP
+ntp_enabled: true
+ntp_servers:
+  - 0.pl.pool.ntp.org
+  - 1.pl.pool.ntp.org
+  - 2.pl.pool.ntp.org
+
+
+# Swap
+swap_file_path: /swapfile
+swap_file_size_mb: 2048
+swap_swappiness: 10
+swap_create: true
+
+
+
+# External disks configuration
+# You can select by partition ID, disk ID + partition number
+external_disks: []
+# Examples:
+# 
+# Variant 1: By Partition UUID (the most reliable)
+# external_disks:
+#   - name: cryobs_main
+#     uuid: "12345678-abcd-1234-abcd-1234567890ab"  # Найти: sudo blkid
+#     mount_point: /mnt/cryobs
+#     mount_options: defaults,nofail
+#     fstype: ext4  # или auto
+#     ...
+#
+# Variant 2: By Partition ID (for /dev/disk/by-id/)
+# external_disks:
+#   - name: cryobs_main
+#     partition_id: "ata-WDC_WD10EZEX-08WN4A0_WD-WCC6Y7PXXXXX-part1"
+#     mount_point: /mnt/cryobs
+#     ...
+#
+# Variant 3: by Disk ID + partition number (legacy)
+# external_disks:
+#   - name: cryobs_main
+#     disk_id: "ata-WDC_WD10EZEX-08WN4A0_WD-WCC6Y7PXXXXX"
+#     partition: 1
+#     mount_point: /mnt/cryobs
+#     ...
+#
+# Full example:
+# external_disks:
+#   - name: cryobs_main
+#     partition_id: "ata-WDC_WD10EZEX-part1"  # Priority 1
+#     # OR uuid: "xxxx-xxxx"                  # Priority 2
+#     # OR disk_id + partition                # Priority 3
+#     mount_point: /mnt/cryobs
+#     fstype: ext4
+#     mount_options: defaults,nofail
+#     dump: 0
+#     pass: 2
+#     owner: "{{ ansible_user }}"
+#     group: "{{ ansible_user }}"
+#     mode: "0755"
+#     directory_structure:
+#       services: {}
+#       data:
+#         forgejo: {}
+#         nginx-proxy-manager: {}
+#       backups: {}
+
+
+
+# System limits
+system_limits:
+  - domain: '*'
+    type: soft
+    item: nofile
+    value: 65536
+  - domain: '*'
+    type: hard
+    item: nofile
+    value: 65536
+  - domain: root
+    type: soft
+    item: nofile
+    value: 65536
+  - domain: root
+    type: hard
+    item: nofile
+    value: 65536
+
+
+# Sysctl settings
+sysctl_settings:
+  net.ipv4.ip_forward: 0
+  net.ipv6.conf.all.forwarding: 0
+  vm.swappiness: "{{ swap_swappiness }}"
+  fs.inotify.max_user_watches: 524288
+  fs.file-max: 2097152
+
+# Hostname
+set_hostname: true
+hostname: "{{ inventory_hostname }}"
+
+# Command history
+history_size: 10000
+histfile_size: 20000
+
+
+
+
+

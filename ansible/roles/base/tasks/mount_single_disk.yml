@@ -1,0 +1,195 @@
+---
+# Device selection priority:
+# 1. partition_id (directly /dev/disk/by-id/xxx-part1)
+# 2. uuid (by UUID=xxx)
+# 3. disk_id + partition (legacy)
+
+- name: "[{{ disk.name }}] Determine partition source method"
+  set_fact:
+    _use_partition_id: "{{ disk.partition_id is defined and disk.partition_id }}"
+    _use_uuid: "{{ disk.uuid is defined and disk.uuid and (disk.partition_id is not defined or not disk.partition_id) }}"
+    _use_disk_id: "{{ disk.disk_id is defined and disk.disk_id and (disk.partition_id is not defined or not disk.partition_id) and (disk.uuid is not defined or not disk.uuid) }}"
+
+- name: "[{{ disk.name }}] Block for partition_id method"
+  when: _use_partition_id | bool
+  block:
+    - name: "[{{ disk.name }}] Set partition path from partition_id"
+      set_fact:
+        actual_partition_path: "/dev/disk/by-id/{{ disk.partition_id }}"
+    
+    - name: "[{{ disk.name }}] Verify partition_id path exists"
+      stat:
+        path: "{{ actual_partition_path }}"
+      register: partition_check
+    
+    - name: "[{{ disk.name }}] Fail if partition_id not found"
+      fail:
+        msg: |
+          Partition ID not found for disk {{ disk.name }}!
+          
+          Path checked: {{ actual_partition_path }}
+          
+          Available partition IDs:
+          {{ disk_ids_list.stdout }}
+          
+          Run on server:
+            ls -l /dev/disk/by-id/ | grep part
+      when: not partition_check.stat.exists
+
+- name: "[{{ disk.name }}] Block for UUID method"
+  when: _use_uuid | bool
+  block:
+    - name: "[{{ disk.name }}] Find device by UUID"
+      command: blkid -U {{ disk.uuid }}
+      register: uuid_device
+      changed_when: false
+      failed_when: uuid_device.rc != 0
+    
+    - name: "[{{ disk.name }}] Set partition path from UUID lookup"
+      set_fact:
+        actual_partition_path: "{{ uuid_device.stdout }}"
+    
+    - name: "[{{ disk.name }}] Display UUID resolution"
+      debug:
+        msg: "UUID {{ disk.uuid }} → {{ actual_partition_path }}"
+
+
+- name: "[{{ disk.name }}] Block for disk_id method (legacy)"
+  when: _use_disk_id | bool
+  block:
+    - name: "[{{ disk.name }}] Construct device path from disk ID"
+      set_fact:
+        disk_device_path: "/dev/disk/by-id/{{ disk.disk_id }}"
+        disk_partition_path: "/dev/disk/by-id/{{ disk.disk_id }}-part{{ disk.partition }}"
+    
+    - name: "[{{ disk.name }}] Check if disk-partN exists (GPT/modern)"
+      stat:
+        path: "{{ disk_partition_path }}"
+      register: partition_modern
+    
+    - name: "[{{ disk.name }}] Check if diskN exists (MBR/old style)"
+      stat:
+        path: "{{ disk_device_path }}{{ disk.partition }}"
+      register: partition_legacy
+      when: not partition_modern.stat.exists
+    
+    - name: "[{{ disk.name }}] Set actual partition path"
+      set_fact:
+        actual_partition_path: >-
+          {{
+            disk_partition_path if partition_modern.stat.exists
+            else (disk_device_path + disk.partition | string)
+          }}
+    
+    - name: "[{{ disk.name }}] Verify partition exists"
+      stat:
+        path: "{{ actual_partition_path }}"
+      register: partition_check
+    
+    - name: "[{{ disk.name }}] Fail if partition not found"
+      fail:
+        msg: |
+          Partition not found for disk {{ disk.name }}!
+          
+          Tried paths:
+            - {{ disk_partition_path }} (GPT style)
+            - {{ disk_device_path }}{{ disk.partition }} (MBR style)
+          
+          Available disk IDs:
+          {{ disk_ids_list.stdout }}
+          
+          Run this on server:
+            ls -l /dev/disk/by-id/
+      when: not partition_check.stat.exists
+
+
+- name: "[{{ disk.name }}] Fail if no valid method specified"
+  fail:
+    msg: |
+      No valid partition identification method for disk {{ disk.name }}!
+      
+      You must specify ONE of:
+        - partition_id: "ata-DISK-part1"  (recommended)
+        - uuid: "xxxx-xxxx-xxxx"          (also good)
+        - disk_id + partition             (legacy)
+      
+      Run on server to find:
+        sudo blkid                        # for UUIDs
+        ls -l /dev/disk/by-id/ | grep part  # for partition_id
+  when: not (_use_partition_id | bool or _use_uuid | bool or _use_disk_id | bool)
+
+
+
+- name: "[{{ disk.name }}] Get partition UUID for fstab"
+  command: blkid -s UUID -o value {{ actual_partition_path }}
+  register: partition_uuid
+  changed_when: false
+
+- name: "[{{ disk.name }}] Display disk info"
+  debug:
+    msg:
+      - "Disk: {{ disk.name }}"
+      - "Method: {{ 'partition_id' if _use_partition_id else ('uuid' if _use_uuid else 'disk_id+partition') }}"
+      - "Partition: {{ actual_partition_path }}"
+      - "UUID: {{ partition_uuid.stdout }}"
+      - "Mount: {{ disk.mount_point }}"
+
+- name: "[{{ disk.name }}] Create mount point"
+  file:
+    path: "{{ disk.mount_point }}"
+    state: directory
+    mode: '0755'
+
+- name: "[{{ disk.name }}] Check if already mounted"
+  command: mountpoint -q {{ disk.mount_point }}
+  register: mountpoint_check
+  changed_when: false
+  failed_when: false
+
+- name: "[{{ disk.name }}] Get filesystem type if not specified"
+  command: blkid -s TYPE -o value {{ actual_partition_path }}
+  register: detected_fstype
+  changed_when: false
+  when: disk.fstype is not defined or disk.fstype == 'auto'
+
+- name: "[{{ disk.name }}] Set filesystem type"
+  set_fact:
+    effective_fstype: "{{ disk.fstype | default(detected_fstype.stdout) }}"
+
+- name: "[{{ disk.name }}] Add to fstab and mount"
+  mount:
+    path: "{{ disk.mount_point }}"
+    src: "UUID={{ partition_uuid.stdout }}"
+    fstype: "{{ effective_fstype }}"
+    opts: "{{ disk.mount_options | default('defaults,nofail') }}"
+    dump: "{{ disk.dump | default(0) }}"
+    passno: "{{ disk.pass | default(2) }}"
+    state: mounted
+
+- name: "[{{ disk.name }}] Set mount point ownership"
+  file:
+    path: "{{ disk.mount_point }}"
+    owner: "{{ disk.owner | default(ansible_user) }}"
+    group: "{{ disk.group | default(ansible_user) }}"
+    mode: "{{ disk.mode | default('0755') }}"
+
+- name: "[{{ disk.name }}] Create directory structure"
+  include_tasks: create_directory_structure.yml
+  vars:
+    base_path: "{{ disk.mount_point }}"
+    structure: "{{ disk.directory_structure | default({}) }}"
+    dir_owner: "{{ disk.owner | default(ansible_user) }}"
+    dir_group: "{{ disk.group | default(ansible_user) }}"
+    dir_mode: "{{ disk.mode | default('0755') }}"
+  when: disk.directory_structure is defined
+
+- name: "[{{ disk.name }}] Verify mount and get info"
+  command: df -h {{ disk.mount_point }}
+  register: mount_info
+  changed_when: false
+
+- name: "[{{ disk.name }}] Display mount info"
+  debug:
+    var: mount_info.stdout_lines
+
+
