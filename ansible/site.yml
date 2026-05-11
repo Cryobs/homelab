@@ -1,0 +1,79 @@
+---
+# main playbook - runs all
+
+- name: Bootstrap homelab infrastructure
+  hosts: homelab
+  become: true
+  
+  pre_tasks:
+    - name: Wait for system to be ready
+      wait_for_connection:
+        timeout: 300
+    
+    - name: Gather facts
+      setup:
+  
+  roles:
+    - role: base
+      tags: ['base', 'bootstrap']
+    
+    - role: openssh
+      tags: ['ssh', 'bootstrap']
+    
+    - role: ufw
+      tags: ['firewall', 'bootstrap']
+    
+    - role: fail2ban
+      tags: ['security', 'bootstrap']
+    
+    - role: docker
+      tags: ['docker', 'bootstrap']
+    
+#    - role: nginx_proxy
+#      tags: ['nginx', 'proxy']
+#      when: npm_enabled | default(true)
+    
+#    - role: forgejo
+#      tags: ['forgejo', 'git']
+#      when: forgejo_enabled | default(true)
+    
+#    - role: forgejo_runner
+#      tags: ['forgejo', 'runner']
+#      when: forgejo_runner_enabled | default(true)
+    
+#    - role: forgejo_secrets
+#      tags: ['forgejo', 'secrets']
+#      when: forgejo_enabled | default(true)
+
+  post_tasks:
+    - name: Run system info script
+      command: /usr/local/bin/homelab/system-info
+      register: system_info
+      changed_when: false
+    
+    - name: Display system info
+      debug:
+        var: system_info.stdout_lines
+    
+    - name: Display setup summary
+      debug:
+        msg:
+          - "╔════════════════════════════════════════════════╗"
+          - "║  Homelab Bootstrap Complete!                   ║"
+          - "╚════════════════════════════════════════════════╝"
+          - ""
+          - "🌐 Nginx Proxy Manager: http://{{ ansible_host }}:81"
+          - "   Default: admin@example.com / changeme"
+          - ""
+          - "📦 Forgejo: http://{{ ansible_host }}:3000"
+          - "   Admin: {{ forgejo_admin_user }}"
+          - ""
+          - "💾 External disk: {{ external_disk_mount_point }}"
+          - "   Size: {{ mount_check.stdout_lines[1].split()[1] if mount_check is defined else 'N/A' }}"
+          - ""
+          - "🔧 Next steps:"
+          - "   1. Configure Nginx Proxy Manager SSL"
+          - "   2. Add Cloudflare DNS records"
+          - "   3. Push homelab repo to Forgejo"
+          - ""
+          - "📖 Documentation: docs/BOOTSTRAP.md"

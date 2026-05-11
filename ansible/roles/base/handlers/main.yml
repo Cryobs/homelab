@@ -1,3 +1,11 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# handlers file for base
+- name: restart timesyncd
+  systemd:
+    name: systemd-timesyncd
+    state: restarted
+
+- name: reboot if needed
+  reboot:
+    msg: "Reboot initiated by Ansible"
+    reboot_timeout: 600
+  when: ansible_reboot_required is defined and ansible_reboot_required

@@ -1,3 +1,111 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# tasks file for base
+- name: Include OS-specific tasks
+  include_tasks: "{{ ansible_os_family | lower }}.yml"
+
+- name: Set hostname
+  hostname:
+    name: "{{ hostname }}"
+  when: set_hostname
+  notify: reboot if needed
+
+- name: Update /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1'
+    line: "127.0.1.1 {{ hostname }}"
+    state: present
+  when: set_hostname
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Configure locale
+  locale_gen:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ locale_gen }}"
+
+- name: Set default locale
+  command: localectl set-locale LANG={{ locale }}
+  changed_when: false
+
+- name: Install base packages
+  apt:
+    name: "{{ base_packages }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+
+- name: Configure NTP
+  include_tasks: ntp.yml
+  when: ntp_enabled
+
+- name: Configure swap
+  include_tasks: swap.yml
+  when: swap_create
+
+- name: Mount external disk
+  include_tasks: mount_disk.yml
+  when: external_disks | length == 0
+
+- name: Configure system limits
+  pam_limits:
+    domain: "{{ item.domain }}"
+    limit_type: "{{ item.type }}"
+    limit_item: "{{ item.item }}"
+    value: "{{ item.value }}"
+  loop: "{{ system_limits }}"
+
+- name: Configure sysctl
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: true
+  loop: "{{ sysctl_settings | dict2items }}"
+
+- name: Configure bash history
+  blockinfile:
+    path: /etc/profile.d/history.sh
+    create: true
+    mode: '0644'
+    block: |
+      export HISTSIZE={{ history_size }}
+      export HISTFILESIZE={{ histfile_size }}
+      export HISTTIMEFORMAT="%F %T "
+      export HISTCONTROL=ignoredups:erasedups
+      shopt -s histappend
+
+- name: Create ansible user scripts directory
+  file:
+    path: /usr/local/bin/homelab
+    state: directory
+    mode: '0755'
+
+#- name: Deploy system info script
+#  copy:
+#    dest: /usr/local/bin/homelab/system-info
+#    mode: '0755'
+#    content: |
+#      #!/usr/bin/env bash
+#      echo "╔════════════════════════════════════════════════╗"
+#      echo "║  System Information                            ║"
+#      echo "╚════════════════════════════════════════════════╝"
+#      echo ""
+#      echo "Hostname: $(hostname)"
+#      echo "OS: $(lsb_release -d | cut -f2)"
+#      echo "Kernel: $(uname -r)"
+#      echo "Uptime: $(uptime -p)"
+#      echo ""
+#      echo "CPU: $(nproc) cores"
+#      echo "RAM: $(free -h | awk '/^Mem:/ {print $2}')"
+#      echo "Disk: $(df -h {{ external_disk_mount_point }} | awk 'NR==2 {print $2 " total, " $3 " used, " $4 " available"}')"
+#      echo ""
+#      echo "Docker: $(docker --version 2>/dev/null || echo 'Not installed')"
+#      echo "Containers running: $(docker ps -q 2>/dev/null | wc -l)"
+
+- name: Configure unattended-upgrades
+  include_tasks: unattended_upgrades.yml
+  when: ansible_os_family == "Debian"

@@ -1,0 +1,30 @@
+---
+- name: Install NTP packages
+  apt:
+    name:
+      - systemd-timesyncd
+    state: present
+
+- name: Configure timesyncd
+  template:
+    src: timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart timesyncd
+
+- name: Enable and start timesyncd
+  systemd:
+    name: systemd-timesyncd
+    enabled: true
+    state: started
+
+- name: Check time synchronization status
+  command: timedatectl status
+  register: timedatectl_status
+  changed_when: false
+
+- name: Display time sync status
+  debug:
+    var: timedatectl_status.stdout_lines
