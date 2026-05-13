@@ -6,15 +6,3 @@
     state: present
     update_cache: yes
 
-- name: Apply UFW rules
-  community.general.ufw:
-    rule: "{{ item.rule }}"
-    port: "{{ item.port }}"
-    proto: "{{ item.proto }}"
-    log: "{{ item.log }}"
-  loop: "{{ ufw_rules }}"
-
-- name: Set default policy and enable
-  community.general.ufw:
-    policy: deny
-    state: enabled

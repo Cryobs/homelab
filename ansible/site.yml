@@ -57,23 +57,9 @@
     
     - name: Display setup summary
       debug:
-        msg:
-          - "╔════════════════════════════════════════════════╗"
-          - "║  Homelab Bootstrap Complete!                   ║"
-          - "╚════════════════════════════════════════════════╝"
-          - ""
-          - "🌐 Nginx Proxy Manager: http://{{ ansible_host }}:81"
-          - "   Default: admin@example.com / changeme"
-          - ""
-          - "📦 Forgejo: http://{{ ansible_host }}:3000"
-          - "   Admin: {{ forgejo_admin_user }}"
-          - ""
-          - "💾 External disk: {{ external_disk_mount_point }}"
-          - "   Size: {{ mount_check.stdout_lines[1].split()[1] if mount_check is defined else 'N/A' }}"
-          - ""
-          - "🔧 Next steps:"
-          - "   1. Configure Nginx Proxy Manager SSL"
-          - "   2. Add Cloudflare DNS records"
-          - "   3. Push homelab repo to Forgejo"
-          - ""
-          - "📖 Documentation: docs/BOOTSTRAP.md"
+        msg: |
+          ╔════════════════════════════════════════════════╗
+          ║  Homelab Bootstrap Complete!                   ║
+          ╚════════════════════════════════════════════════╝
+
+           Documentation: docs/BOOTSTRAP.md

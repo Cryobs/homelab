@@ -84,27 +84,12 @@
     state: directory
     mode: '0755'
 
-#- name: Deploy system info script
-#  copy:
-#    dest: /usr/local/bin/homelab/system-info
-#    mode: '0755'
-#    content: |
-#      #!/usr/bin/env bash
-#      echo "╔════════════════════════════════════════════════╗"
-#      echo "║  System Information                            ║"
-#      echo "╚════════════════════════════════════════════════╝"
-#      echo ""
-#      echo "Hostname: $(hostname)"
-#      echo "OS: $(lsb_release -d | cut -f2)"
-#      echo "Kernel: $(uname -r)"
-#      echo "Uptime: $(uptime -p)"
-#      echo ""
-#      echo "CPU: $(nproc) cores"
-#      echo "RAM: $(free -h | awk '/^Mem:/ {print $2}')"
-#      echo "Disk: $(df -h {{ external_disk_mount_point }} | awk 'NR==2 {print $2 " total, " $3 " used, " $4 " available"}')"
-#      echo ""
-#      echo "Docker: $(docker --version 2>/dev/null || echo 'Not installed')"
-#      echo "Containers running: $(docker ps -q 2>/dev/null | wc -l)"
+- name: Deploy system info script
+  template:
+    src: system-info.j2
+    dest: /usr/local/bin/homelab/system-info
+    mode: '0755'
+
 
 - name: Configure unattended-upgrades
   include_tasks: unattended_upgrades.yml
