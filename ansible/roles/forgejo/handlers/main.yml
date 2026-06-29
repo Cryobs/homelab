@@ -1,0 +1,7 @@
+---
+- name: restart forgejo
+  community.docker.docker_compose_v2:
+    project_src: "{{ homelab_services_dir }}/forgejo"
+    state: restarted
+    services:
+      - server

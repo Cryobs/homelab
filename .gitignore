@@ -1,3 +1,5 @@
 ansible/secrets
 ansible/hosts.txt
 *.key
+.vault_pass
+.ansible_vault_pass

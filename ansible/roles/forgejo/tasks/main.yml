@@ -1,0 +1,68 @@
+---
+- name: Create Forgejo directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: '0755'
+  loop:
+    - "{{ forgejo_data_dir }}"
+    - "{{ homelab_services_dir }}/forgejo"
+
+- name: Deploy Forgejo docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ homelab_services_dir }}/forgejo/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  notify: restart forgejo
+
+- name: Start Forgejo
+  community.docker.docker_compose_v2:
+    project_src: "{{ homelab_services_dir }}/forgejo"
+    state: present
+  register: forgejo_deploy
+
+- name: Wait for Forgejo to be ready
+  uri:
+    url: "http://{{ ansible_host }}:{{ forgejo_http_port }}/api/v1/version"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 30
+  delay: 2
+
+- name: Check if admin user exists
+  community.docker.docker_container_exec:
+    container: forgejo
+    command: forgejo admin user list
+  register: user_list
+  changed_when: false
+  failed_when: false
+
+- name: Create admin user
+  community.docker.docker_container_exec:
+    container: forgejo
+    command: >
+      forgejo admin user create
+      --admin
+      --username {{ forgejo_admin_user }}
+      --password {{ forgejo_admin_password }}
+      --email {{ forgejo_admin_email }}
+      --must-change-password=false
+  when: forgejo_admin_user not in user_list.stdout
+  register: admin_created
+
+- name: Generate runner registration token
+  community.docker.docker_container_exec:
+    container: forgejo
+    command: forgejo actions generate-runner-token
+  register: runner_token_output
+  changed_when: false
+
+- name: Set runner token fact
+  set_fact:
+    forgejo_runner_token: "{{ runner_token_output.stdout | trim }}"
+  when: runner_token_output.stdout is defined

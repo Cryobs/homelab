@@ -1,0 +1,9 @@
+---
+fogejo_version: "9"
+fogejo_http_port: 3000
+fogejo_ssh_port: 222
+fogejo_data_dir: "/mnt/cryobs/data/forgejo"
+forgejo_network_name: "homelab"
+forgejo_root_url: "https://{{ vault_fogejo_domain }}"
+
+forgejo_actions_enabled: true
